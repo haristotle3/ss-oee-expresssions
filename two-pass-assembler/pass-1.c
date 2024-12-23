@@ -55,7 +55,7 @@ int passOne(FILE *input_file, FILE *intermediate_file)
         LOCCTR = START;
 
         // First line doesn't require a location.
-        fprintf(intermediate_file, "%s\t%s\t%x\n", label, mnemonic, start_address);
+        fprintf(intermediate_file, "%14s%10s%10x\n", label, mnemonic, start_address);
 
         // read next input line
         fscanf(input_file, "%s\t%s\t%s", label, mnemonic, operand);
@@ -75,7 +75,7 @@ int passOne(FILE *input_file, FILE *intermediate_file)
             continue;
         }
 
-        fprintf(intermediate_file, "%04x\t%s\t%s\t%s\n", LOCCTR, label, mnemonic, operand);
+        fprintf(intermediate_file, "%04x%10s%10s%10s\n", LOCCTR, label, mnemonic, operand);
         // If there is a symbol in the LABEL field
         if (strcmp(label, EMPTY) != 0)
         {
@@ -129,7 +129,7 @@ int passOne(FILE *input_file, FILE *intermediate_file)
     }
 
     int program_length = LOCCTR - START;
-    fprintf(intermediate_file, "%04x\t%s\t%s\t%s\n", 0000, "****", "END", "****");
+    fprintf(intermediate_file, "%04x%10s%10s%10s\n", 0000, EMPTY, "END", EMPTY);
     printf("Pass 1 of 2 of two completed successfully.\n");
 
     return program_length;

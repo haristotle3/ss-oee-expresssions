@@ -6,8 +6,8 @@
 
 int passTwo(FILE *, FILE *, FILE *);
 
-unsigned long long int assemble_instruction(char *, char *, int);
 // hardest. Need to use some creativity.
+unsigned long long int assemble_instruction(char *, char *, int);
 void get_literal_value(char *, char *);
 unsigned long long int get_string_literal_hex(char *);
 int get_object_code_length(unsigned long long int);
@@ -46,7 +46,7 @@ int main()
 
 int passTwo(FILE *input_file, FILE *object_program, FILE *assembly_listing)
 {
-
+    int resb_resw_previously = 0; // set to 1, if the previous OPCODE was RESB or RESB
     char program_name[MAX_TOKEN_LENGTH];
     int start_address;
     int length;
@@ -59,7 +59,7 @@ int passTwo(FILE *input_file, FILE *object_program, FILE *assembly_listing)
     fscanf(input_file, "%s\t%s\t%x", program_name, mnemonic, &start_address);
 
     if (strcmp(mnemonic, "START") == 0)
-        fprintf(assembly_listing, "%4s\t%8s\t%8x\n", program_name, mnemonic, start_address);
+        fprintf(assembly_listing, "%4s%10s%10x\n", program_name, mnemonic, start_address);
     else
     {
         printf("ERROR: Assembler expects START opcode in line 1.\n");
@@ -130,7 +130,25 @@ int passTwo(FILE *input_file, FILE *object_program, FILE *assembly_listing)
         }
         else if (strcmp(mnemonic, "RESW") == 0 || strcmp(mnemonic, "RESB") == 0)
         {
-            fprintf(assembly_listing, "%04x\t%8s\t%8s\t%8s\n", location, label, mnemonic, operand);
+            fprintf(assembly_listing, "%04x%10s%10s%10s\n", location, label, mnemonic, operand);
+
+            // Break into a new text record,
+            // but don't create another if the previous instruction
+            // was also an assembler directive.
+
+            if (!resb_resw_previously)
+            {
+                int obj_code_length = get_object_code_length(assembled_object_code);
+                fprintf(temp_text_record, "\n");
+                update_text_record_length(temp_text_record, text_record_length);
+
+                // Start new text_record.
+                text_record_length = obj_code_length;
+                text_record_start_address = location;
+                fprintf(temp_text_record, "%c%06x%02x", 'T', text_record_start_address, text_record_length);
+
+                resb_resw_previously = 1;
+            }
             continue;
         }
 
@@ -140,7 +158,7 @@ int passTwo(FILE *input_file, FILE *object_program, FILE *assembly_listing)
             fprintf(temp_text_record, "\n");
             update_text_record_length(temp_text_record, text_record_length);
 
-            // Start new text_record.
+            // Start new text_record
             text_record_length = obj_code_length;
             text_record_start_address = location;
             fprintf(temp_text_record, "%c%06x%02x", 'T', text_record_start_address, text_record_length);
@@ -154,9 +172,11 @@ int passTwo(FILE *input_file, FILE *object_program, FILE *assembly_listing)
         fprintf(temp_text_record, "%0*llx", 2 * obj_code_length, assembled_object_code);
 
         if (strcmp(mnemonic, "END") != 0)
-            fprintf(assembly_listing, "%04x\t%8s\t%8s\t%8s\t%0*llx\n", location, label, mnemonic, operand, 2 * obj_code_length, assembled_object_code);
+            fprintf(assembly_listing, "%04x%10s%10s%10s%4s%0*llx\n", location, label, mnemonic, operand, " ", 2 * obj_code_length, assembled_object_code);
         else
-            fprintf(assembly_listing, "%4s\t%8s\t%8s\t%8s\n", "****", label, mnemonic, "****");
+            fprintf(assembly_listing, "%4s%10s%10s%10s\n", EMPTY, label, mnemonic, EMPTY);
+
+        resb_resw_previously = 0;
     }
 
     fprintf(temp_text_record, "\n");
