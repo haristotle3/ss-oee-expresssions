@@ -12,6 +12,7 @@ void get_literal_value(char *, char *);
 unsigned long long int get_string_literal_hex(char *);
 int get_object_code_length(unsigned long long int);
 void update_text_record_length(FILE *, int);
+void update_text_record_start_address(FILE *, int, int);
 
 int increment_pc();
 void init_pc_file();
@@ -143,14 +144,16 @@ int passTwo(FILE *input_file, FILE *object_program, FILE *assembly_listing)
                 update_text_record_length(temp_text_record, text_record_length);
 
                 // Start new text_record.
-                text_record_length = obj_code_length;
+                text_record_length = 0;
                 text_record_start_address = location;
-                fprintf(temp_text_record, "%c%06x%02x", 'T', text_record_start_address, text_record_length);
 
                 resb_resw_previously = 1;
             }
             continue;
         }
+
+        if (resb_resw_previously)
+            update_text_record_start_address(temp_text_record, location, text_record_length);
 
         int obj_code_length = get_object_code_length(assembled_object_code);
         if (text_record_length + obj_code_length > 30) // 30 bytes take up 60 columns, which is maximum that one text record can hold.
@@ -397,5 +400,11 @@ void update_text_record_length(FILE *temp_text_record, int text_record_length)
     // Go back to the end of the file.
     fseek(temp_text_record, 0, SEEK_END);
 
+    return;
+}
+
+void update_text_record_start_address(FILE *temp_text_record, int text_record_start_address, int text_record_length)
+{
+    fprintf(temp_text_record, "%c%06x%02x", 'T', text_record_start_address, text_record_length);
     return;
 }

@@ -1,4 +1,4 @@
-COPY    START   0
+COPY    START   4000
 FIRST   STL     RETADR
 ____    LDB     #LENGTH
 ____    BASE    LENGTH
