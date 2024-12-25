@@ -38,7 +38,7 @@ int main()
     if (passTwo(input_file, object_program, assembly_listing) == ERROR_VALUE)
         printf("Assembly failed.\n");
     else
-        printf("Success!\n");
+        printf("Pass 2 of 2 of two completed successfully.\n");
 
     fclose(input_file);
     fclose(object_program);
@@ -160,6 +160,7 @@ int passTwo(FILE *input_file, FILE *object_program, FILE *assembly_listing)
             update_text_record_start_address(temp_text_record, location, text_record_length);
 
         int obj_code_length = get_object_code_length(assembled_object_code);
+
         if (text_record_length + obj_code_length > 30) // 30 bytes take up 60 columns, which is maximum that one text record can hold.
         {
             fprintf(temp_text_record, "\n");
@@ -171,16 +172,22 @@ int passTwo(FILE *input_file, FILE *object_program, FILE *assembly_listing)
             text_record_start_address = location;
             fprintf(temp_text_record, "%c %06x %02x", 'T', text_record_start_address, text_record_length);
         }
-        else
+        else if (strcmp(mnemonic, "EQU") != 0)
             text_record_length += obj_code_length;
 
         // Write the assembled object code.
         // %0*x is variable padding length, length is obj_code_length.
         // Multiply by 2 to obj_code_length for leading zeroes.
-        fprintf(temp_text_record, " %0*llx", 2 * obj_code_length, assembled_object_code);
-        num_instructions_in_one_text_record++;
+        if (strcmp(mnemonic, "EQU") != 0)
+        {
+            // No object code for for EQU.
+            fprintf(temp_text_record, " %0*llx", 2 * obj_code_length, assembled_object_code);
+            num_instructions_in_one_text_record++;
+        }
 
-        if (strcmp(mnemonic, "END") != 0)
+        if (strcmp(mnemonic, "EQU") == 0)
+            fprintf(assembly_listing, "%04x%10s%10s%10s%4s\n", location, label, mnemonic, operand, " ");
+        else if (strcmp(mnemonic, "END") != 0)
             fprintf(assembly_listing, "%04x%10s%10s%10s%4s%0*llx\n", location, label, mnemonic, operand, " ", 2 * obj_code_length, assembled_object_code);
         else
             fprintf(assembly_listing, "%4s%10s%10s%10s\n", EMPTY, label, mnemonic, EMPTY);
@@ -207,8 +214,6 @@ int passTwo(FILE *input_file, FILE *object_program, FILE *assembly_listing)
     // Refer README.md
     fprintf(object_program, "E%06x\n", start_address);
     fclose(PROGRAM_COUNTER_FILE);
-
-    printf("Pass 2 of 2 of two completed successfully.\n");
 
     return 1;
 }

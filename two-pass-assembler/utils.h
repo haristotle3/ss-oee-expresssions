@@ -16,3 +16,4 @@ int get_immediate_value(char *);
 int opcode_search(char *);
 int opcode_instruction_format(char *);
 int opcode_value(char *);
+int is_number(char *);

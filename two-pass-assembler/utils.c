@@ -187,7 +187,7 @@ int opcode_instruction_format(char mnemonic[])
 
 int is_immediate_number(char operand[])
 {
-    // Returns 1 if its an immediate number
+    // Returns 1 if its an immediate number OR a symbol exists in SYMTAB
     // Returns 0 if its not.
     if (operand[0] == '#')
     {
@@ -209,4 +209,13 @@ int get_immediate_value(char operand[])
         symbol_value = 10 * symbol_value + (operand[i] - '0');
 
     return symbol_value;
+}
+
+int is_number(char *operand)
+{
+    for (int i = 0; i < strlen(operand); i++)
+        if (!isdigit(operand[i]))
+            return 0;
+
+    return 1;
 }

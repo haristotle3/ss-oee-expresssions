@@ -17,10 +17,12 @@ COPY     START      4000
 4030    RETADR      RESW         1
 4033    LENGTH      RESW         1
 4036    BUFFER      RESB      4096
+5036   BUFFEND       EQU         *    
+5036    MAXLEN       EQU      4096    
 5036     RDREC     CLEAR         X    b410
 5038      ____     CLEAR         A    b400
 503a      ____     CLEAR         S    b440
-503c      ____      +LDT     #4096    75101000
+503c      ____      +LDT   #MAXLEN    75101000
 5040     RLOOP        TD     INPUT    e32017
 5043      ____       JEQ     RLOOP    332ffa
 5046      ____        RD     INPUT    db2011
@@ -34,12 +36,15 @@ COPY     START      4000
 505a     INPUT      BYTE     X'F1'    f1
 505b     WRREC     CLEAR         X    b410
 505d      ____       LDT    LENGTH    774000
-5060     WLOOP        TD    OUTPUT    e3200f
-5063      ____       JEQ     WLOOP    332ffa
-5066      ____      LDCH  BUFFER,X    53c003
-5069      ____        WD    OUTPUT    df2006
-506c      ____      TIXR         T    b850
-506e      ____       JLT     WLOOP    3b2fef
-5071      ____      RSUB      ____    4f0000
-5072    OUTPUT      BYTE     X'05'    05
+5060     ALPHA      RESW         1
+5063      BETA       EQU     ALPHA    
+5063     GAMMA       EQU      BETA    
+5063     WLOOP        TD    OUTPUT    e3200f
+5066      ____       JEQ     WLOOP    332ffa
+5069      ____      LDCH  BUFFER,X    53c003
+506c      ____        WD    OUTPUT    df2006
+506f      ____      TIXR         T    b850
+5071      ____       JLT     WLOOP    3b2fef
+5074      ____      RSUB      ____    4f0000
+5075    OUTPUT      BYTE     X'05'    05
 ____      ____       END      ____

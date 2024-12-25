@@ -18,6 +18,8 @@ EOF     BYTE    C'EOF'
 RETADR  RESW    1
 LENGTH  RESW    1
 BUFFER  RESB    4096
+BUFFEND EQU     *
+MAXLEN  EQU     4096
 .       .       .
 .       this_is_a_comment     seperate_words_without_whitespaces
 .       .       .
@@ -26,7 +28,7 @@ BUFFER  RESB    4096
 RDREC   CLEAR   X
 ____    CLEAR   A
 ____    CLEAR   S
-____    +LDT    #4096
+____    +LDT    #MAXLEN
 RLOOP   TD      INPUT
 ____    JEQ     RLOOP
 ____    RD      INPUT
@@ -43,6 +45,9 @@ INPUT   BYTE    X'F1'
 .       .       .
 WRREC   CLEAR   X
 ____    LDT     LENGTH
+ALPHA   RESW    1
+BETA    EQU     ALPHA
+GAMMA   EQU     BETA
 WLOOP   TD      OUTPUT
 ____    JEQ     WLOOP
 ____    LDCH    BUFFER,X

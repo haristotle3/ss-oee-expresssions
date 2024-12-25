@@ -28,7 +28,7 @@ int main()
     if (program_length == ERROR_VALUE)
         printf("Assembly failed.\n");
     else
-        printf("Success!\n");
+        printf("Pass 1 of 2 of two completed successfully.\n");
 
     fclose(input_file);
     fclose(intermediate_file);
@@ -83,7 +83,10 @@ int passOne(FILE *input_file, FILE *intermediate_file)
         if (strcmp(label, EMPTY) != 0)
         {
             if (!symbol_search(label))
-                insert_symbol_to_SYMTAB(label, LOCCTR);
+            {
+                if (strcmp(mnemonic, "EQU") != 0)
+                    insert_symbol_to_SYMTAB(label, LOCCTR);
+            }
             else
             {
                 printf("ERROR: %s redefined at %x\n", label, LOCCTR);
@@ -121,6 +124,22 @@ int passOne(FILE *input_file, FILE *intermediate_file)
             fscanf(input_file, "%s\t%s\t%s\n", label, mnemonic, operand);
             continue;
         }
+        else if (strcmp(mnemonic, "EQU") == 0)
+        {
+            if (!symbol_search(label))
+            {
+                if (strcmp(operand, "*") == 0)
+                    insert_symbol_to_SYMTAB(label, LOCCTR);
+                else if (is_number(operand))
+                    insert_symbol_to_SYMTAB(label, strtol(operand, NULL, 10));
+                else if (symbol_search(operand))
+                    insert_symbol_to_SYMTAB(label, symbol_value(operand));
+            }
+            else
+            {
+                printf("ERROR: %s redefined at %x\n", label, LOCCTR);
+            }
+        }
         else
         {
             printf("ERROR: Invalid OPCODE (%s) at %x.\n", mnemonic, LOCCTR);
@@ -133,7 +152,6 @@ int passOne(FILE *input_file, FILE *intermediate_file)
 
     int program_length = LOCCTR - START;
     fprintf(intermediate_file, "%04x%10s%10s%10s\n", 0000, EMPTY, "END", EMPTY);
-    printf("Pass 1 of 2 of two completed successfully.\n");
 
     return program_length;
 }
