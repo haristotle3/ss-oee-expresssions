@@ -1,0 +1,45 @@
+COPY     START      4000
+4000     FIRST       STL    RETADR    17202d
+4003      ____       LDB   #LENGTH    69202d
+4006     CLOOP     +JSUB     RDREC    4b105036
+400a      ____       LDA    LENGTH    032026
+400d      ____      COMP        #0    290000
+4010      ____       JEQ    ENDFIL    332007
+4013      ____     +JSUB     WRREC    4b10505b
+4017      ____         J     CLOOP    3f2fec
+401a    ENDFIL       LDA       EOF    032010
+401d      ____       STA    BUFFER    0f2016
+4020      ____       LDA        #3    010003
+4023      ____       STA    LENGTH    0f200d
+4026      ____     +JSUB     WRREC    4b10505b
+402a      ____         J   @RETADR    3e2003
+402d       EOF      BYTE    C'EOF'    454f46
+4030    RETADR      RESW         1
+4033    LENGTH      RESW         1
+4036    BUFFER      RESB      4096
+5036     RDREC     CLEAR         X    b410
+5038      ____     CLEAR         A    b400
+503a      ____     CLEAR         S    b440
+503c      ____      +LDT     #4096    75101000
+5040     RLOOP        TD     INPUT    e32017
+5043      ____       JEQ     RLOOP    332ffa
+5046      ____        RD     INPUT    db2011
+5049      ____     COMPR       A,S    a004
+504b      ____       JEQ      EXIT    332008
+504e      ____      STCH  BUFFER,X    57c003
+5051      ____      TIXR         T    b850
+5053      ____       JLT     RLOOP    3b2fea
+5056      EXIT       STX    LENGTH    134000
+5059      ____      RSUB      ____    4f0000
+505a     INPUT      BYTE     X'F1'    f1
+505b     WRREC     CLEAR         X    b410
+505d      ____       LDT    LENGTH    774000
+5060     WLOOP        TD    OUTPUT    e3200f
+5063      ____       JEQ     WLOOP    332ffa
+5066      ____      LDCH  BUFFER,X    53c003
+5069      ____        WD    OUTPUT    df2006
+506c      ____      TIXR         T    b850
+506e      ____       JLT     WLOOP    3b2fef
+5071      ____      RSUB      ____    4f0000
+5072    OUTPUT      BYTE     X'05'    05
+____      ____       END      ____

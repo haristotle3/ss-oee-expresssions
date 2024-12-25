@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <windows.h>
 #include "utils.h"
 
 int passTwo(FILE *, FILE *, FILE *);
@@ -24,11 +25,12 @@ int BASE = 0;
 int main()
 {
     // input files
-    FILE *input_file = fopen("intermediate.txt", "r");
+    FILE *input_file = fopen("pass-1-outputs/intermediate.txt", "r");
 
     // output files
-    FILE *object_program = fopen("object_program.txt", "w");
-    FILE *assembly_listing = fopen("program_listing.txt", "w");
+    CreateDirectory("pass-2-outputs", NULL);
+    FILE *object_program = fopen("pass-2-outputs/object_program.txt", "w");
+    FILE *assembly_listing = fopen("pass-2-outputs/program_listing.txt", "w");
     // Input file is an assembly program.
     // The program is written in a fixed format with fields
     // LABEL, OPCODE and OPERAND
@@ -69,7 +71,7 @@ int passTwo(FILE *input_file, FILE *object_program, FILE *assembly_listing)
     }
 
     // Program length in decimal.
-    FILE *program_length = fopen("program_length.txt", "r");
+    FILE *program_length = fopen("pass-1-outputs/program_length.txt", "r");
     fscanf(program_length, "%d", &length);
     fclose(program_length);
 
@@ -78,7 +80,7 @@ int passTwo(FILE *input_file, FILE *object_program, FILE *assembly_listing)
 
     int text_record_length = 0;
     int text_record_start_address = start_address;
-    FILE *temp_text_record = fopen("Temp_text_record.txt", "w");
+    FILE *temp_text_record = fopen("pass-2-outputs/Temp_text_record.txt", "w");
     fprintf(temp_text_record, "%c %06x %02x", 'T', text_record_start_address, text_record_length);
     // Later we have to use fseek() and fputc() to replace 0 (text record length)
     // to appropriate value.
@@ -192,13 +194,13 @@ int passTwo(FILE *input_file, FILE *object_program, FILE *assembly_listing)
     fclose(temp_text_record);
 
     // Write to object program
-    temp_text_record = fopen("Temp_text_record.txt", "r");
+    temp_text_record = fopen("pass-2-outputs/Temp_text_record.txt", "r");
 
     for (char ch = fgetc(temp_text_record); ch != EOF; ch = fgetc(temp_text_record))
         fputc(ch, object_program);
 
     fclose(temp_text_record);
-    remove("Temp_text_record.txt");
+    remove("pass-2-outputs/Temp_text_record.txt");
 
     // Write the end record
     // This is not really the correct logic
@@ -326,7 +328,7 @@ unsigned long long int assemble_instruction(char mnemonic[], char operand[], int
 
 void init_pc_file()
 {
-    PROGRAM_COUNTER_FILE = fopen("intermediate.txt", "r");
+    PROGRAM_COUNTER_FILE = fopen("pass-1-outputs/intermediate.txt", "r");
 
     // Read first line and ignore.
     fscanf(PROGRAM_COUNTER_FILE, "%*s\t%*s\t%*s");
