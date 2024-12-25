@@ -13,6 +13,8 @@ COPY     START      4000
 4023      ____       STA    LENGTH    0f200d
 4026      ____     +JSUB     WRREC    4b10505b
 402a      ____         J   @RETADR    3e2003
+402d     IMMED       EQU     #1024    
+402d      CURR       EQU         *    
 402d       EOF      BYTE    C'EOF'    454f46
 4030    RETADR      RESW         1
 4033    LENGTH      RESW         1
@@ -47,4 +49,4 @@ COPY     START      4000
 5071      ____       JLT     WLOOP    3b2fef
 5074      ____      RSUB      ____    4f0000
 5075    OUTPUT      BYTE     X'05'    05
-____      ____       END      ____
+____      ____       END     FIRST

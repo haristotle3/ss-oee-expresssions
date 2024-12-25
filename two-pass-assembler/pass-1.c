@@ -132,8 +132,13 @@ int passOne(FILE *input_file, FILE *intermediate_file)
                     insert_symbol_to_SYMTAB(label, LOCCTR);
                 else if (is_number(operand))
                     insert_symbol_to_SYMTAB(label, strtol(operand, NULL, 10));
-                else if (symbol_search(operand))
+                else if (symbol_search(operand) || is_immediate_number(operand))
                     insert_symbol_to_SYMTAB(label, symbol_value(operand));
+                else
+                {
+                    printf("ERROR: Undefined symbol (%s) at %x\n", operand, LOCCTR);
+                    return ERROR_VALUE;
+                }
             }
             else
             {

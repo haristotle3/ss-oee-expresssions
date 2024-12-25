@@ -14,6 +14,8 @@ ____    LDA     #3
 ____    STA     LENGTH
 ____    +JSUB   WRREC
 ____    J       @RETADR
+IMMED   EQU     #1024
+CURR    EQU     *
 EOF     BYTE    C'EOF'
 RETADR  RESW    1
 LENGTH  RESW    1
