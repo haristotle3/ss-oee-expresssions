@@ -21,7 +21,7 @@ RETADR  RESW    1
 LENGTH  RESW    1
 BUFFER  RESB    4096
 BUFFEND EQU     *
-MAXLEN  EQU     4096
+MAXLEN  EQU     BUFFEND-BUFFER+CURR
 .       .       .
 .       this_is_a_comment     seperate_words_without_whitespaces
 .       .       .

@@ -219,3 +219,74 @@ int is_number(char *operand)
 
     return 1;
 }
+
+int is_expression(char *operand)
+{
+    for (int i = 0; i < strlen(operand); i++)
+    {
+        if ((operand[i] == '+' || operand[i] == '-') && i != 0)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int is_relative_expression(char *operand)
+{
+    int is_relative = 1;
+
+    for (int i = 0; i < strlen(operand); i++)
+    {
+        if (operand[i] == '-')
+            is_relative--;
+        else if (operand[i] == '+' && i != 0)
+            is_relative++;
+    }
+    return (is_relative == 1);
+}
+
+int expression_value(char *expression)
+{
+    int exp_val = 0;
+    char oprtr = '+';
+
+    const char *delimiters = "+-";
+
+    char *expr_copy = strdup(expression);
+    if (!expr_copy)
+    {
+        perror("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    char *operand = strtok(expr_copy, delimiters);
+    while (operand != NULL)
+    {
+        if (symbol_search(operand))
+        {
+            switch (oprtr)
+            {
+            case '+':
+                exp_val += symbol_value(operand);
+                break;
+            case '-':
+                exp_val -= symbol_value(operand);
+                break;
+            }
+        }
+        else
+        {
+            printf("ERROR: Operand (%s) not found in expression: \"%s\"\n", operand, expression);
+            exit(EXIT_FAILURE);
+        }
+
+        operand = strtok(NULL, delimiters);
+        if (operand != NULL)
+        {
+            oprtr = expression[operand - expr_copy - 1];
+        }
+    }
+
+    return exp_val;
+}

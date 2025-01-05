@@ -2,7 +2,7 @@
 #define _UTILS_H
 #endif
 
-#define MAX_TOKEN_LENGTH 25
+#define MAX_TOKEN_LENGTH 256
 #define EMPTY "____"
 #define ERROR_VALUE -1
 #define NUM_REGISTERS 7
@@ -16,4 +16,9 @@ int get_immediate_value(char *);
 int opcode_search(char *);
 int opcode_instruction_format(char *);
 int opcode_value(char *);
+int is_number(char *);
+
+int expression_value(char *);
+int is_relative_expression(char *);
+int is_expression(char *);
 int is_number(char *);
